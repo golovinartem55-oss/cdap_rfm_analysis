@@ -52,4 +52,4 @@
 
 ### Разрешение конфликта
 
-![Conflict Resolution](docs/conflict_resolution.PNG)
+![Conflict Resolution](conflict_resolution.PNG)
