@@ -11,14 +11,19 @@ def load_data(path):
 
 
 def calculate_rfm(df):
-    snapshot_date = df['InvoiceDate'].max()
+    snapshot_date = df['InvoiceDate'].max() + pd.Timedelta(days=1)
 
     rfm = df.groupby('Customer ID').agg({
         'InvoiceDate': lambda x: (snapshot_date - x.max()).days,
-        'Invoice': 'count',
+        'Invoice': 'nunique',
         'TotalPrice': 'sum'
     })
 
     rfm.columns = ['Recency', 'Frequency', 'Monetary']
 
     return rfm
+
+if __name__ == "__main__":
+    df = load_data("data/online_retail_II.xlsx")
+    rfm_table = calculate_rfm(df)
+    print(rfm_table.head())
