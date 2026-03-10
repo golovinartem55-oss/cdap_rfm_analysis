@@ -49,11 +49,11 @@
 
 ### Возникновение конфликта
 
-![Merge Conflict](conflict.PNG)
+![Merge Conflict](docs/conflict.PNG)
 
 ### Разрешение конфликта
 
-![Conflict Resolution](conflict_resolution.PNG)
+![Conflict Resolution](docs/conflict_resolution.PNG)
 
 
 ## Лабораторная работа №2 — Docker-контейнеризация RFM-аналитики
