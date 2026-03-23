@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rfm-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rfm
+      component: app
+  template:
+    metadata:
+      labels:
+        app: rfm
+        component: app
+    spec:
+      imagePullSecrets:
+      - name: regcred                    # ← секрет docker-registry
+      initContainers:
+      - name: wait-for-mongo
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z mongo-service 27017; do
+            echo "Waiting for MongoDB..."
+            sleep 2
+          done
+      containers:
+      - name: app
+        image: rfm-app:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MONGO_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rfm-app-config
+              key: MONGO_HOST
+        - name: MONGO_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rfm-app-config
+              key: MONGO_PORT
+        - name: MONGO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-root-username
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-root-password
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
